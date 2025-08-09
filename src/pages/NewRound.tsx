@@ -171,8 +171,7 @@ export function NewRound() {
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-masters-green mb-2">MoliStats</h1>
-          <p className="text-masters-dark-green">Nueva Ronda de Golf</p>
+          <h1 className="text-4xl font-bold text-masters-green mb-2">Nueva Ronda de Golf</h1>
         </div>
 
         {/* Course Name Input */}

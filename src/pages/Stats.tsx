@@ -28,8 +28,7 @@ export function Stats() {
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-masters-green mb-2">MoliStats</h1>
-          <p className="text-masters-dark-green">Dashboard de Estadísticas</p>
+          <h1 className="text-4xl font-bold text-masters-green mb-2">Dashboard de Estadísticas</h1>
         </div>
 
         {/* Stats Dashboard */}
