@@ -13,8 +13,8 @@ interface AverageStats {
   averageFir: number;
   averageGir: number;
   averagePutts: number;
-  averageScrambling: number;
-  averageSandSave: number;
+  averageScrambling: number | null;
+  averageSandSave: number | null;
   averagePenalties: number;
 }
 
@@ -307,11 +307,15 @@ export function StatsDashboard({ userId }: StatsDashboardProps) {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="card text-center">
             <h4 className="text-sm font-medium text-masters-dark-green mb-2">Scrambling %</h4>
-            <p className="text-2xl font-bold text-masters-green">{averageStats.averageScrambling?.toFixed(1) || '0.0'}%</p>
+            <p className="text-2xl font-bold text-masters-green">
+              {averageStats.averageScrambling !== null ? `${averageStats.averageScrambling.toFixed(1)}%` : 'N/A'}
+            </p>
           </div>
           <div className="card text-center">
             <h4 className="text-sm font-medium text-masters-dark-green mb-2">Sand Save %</h4>
-            <p className="text-2xl font-bold text-masters-green">{averageStats.averageSandSave?.toFixed(1) || '0.0'}%</p>
+            <p className="text-2xl font-bold text-masters-green">
+              {averageStats.averageSandSave !== null ? `${averageStats.averageSandSave.toFixed(1)}%` : 'N/A'}
+            </p>
           </div>
           <div className="card text-center">
             <h4 className="text-sm font-medium text-masters-dark-green mb-2">Penalidades</h4>

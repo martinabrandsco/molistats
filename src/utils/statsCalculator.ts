@@ -60,12 +60,14 @@ export function calculateRoundStats(holes: HoleStats[], courseName: string): Rou
   // Scrambling (Up & Down)
   const scramblingResponses = holes.filter(hole => hole.upAndDown !== 'NA');
   const scramblingYes = scramblingResponses.filter(hole => hole.upAndDown === 'Sí').length;
-  const scramblingPercentage = scramblingResponses.length > 0 ? (scramblingYes / scramblingResponses.length) * 100 : 0;
+  // Only calculate percentage if there are valid responses, otherwise return null
+  const scramblingPercentage = scramblingResponses.length > 0 ? (scramblingYes / scramblingResponses.length) * 100 : null;
   
   // Sand Saves
   const sandSaveResponses = holes.filter(hole => hole.sandSave !== 'NA');
   const sandSaveYes = sandSaveResponses.filter(hole => hole.sandSave === 'Sí').length;
-  const sandSavePercentage = sandSaveResponses.length > 0 ? (sandSaveYes / sandSaveResponses.length) * 100 : 0;
+  // Only calculate percentage if there are valid responses, otherwise return null
+  const sandSavePercentage = sandSaveResponses.length > 0 ? (sandSaveYes / sandSaveResponses.length) * 100 : null;
   
   // Penalties
   const totalPenalties = holes.filter(hole => hole.penalty === 'Sí').length;

@@ -50,8 +50,8 @@ export const statsService = {
       gir_percentage: stats.gir_percentage || stats.girPercentage || 0,
       gir_by_distance: stats.gir_by_distance || stats.girByDistance || {},
       total_putts: stats.total_putts || stats.totalPutts || 0,
-      scrambling_percentage: stats.scrambling_percentage || stats.scramblingPercentage || 0,
-      sand_save_percentage: stats.sand_save_percentage || stats.sandSavePercentage || 0,
+      scrambling_percentage: stats.scrambling_percentage !== undefined ? stats.scrambling_percentage : (stats.scramblingPercentage !== undefined ? stats.scramblingPercentage : null),
+      sand_save_percentage: stats.sand_save_percentage !== undefined ? stats.sand_save_percentage : (stats.sandSavePercentage !== undefined ? stats.sandSavePercentage : null),
       total_penalties: stats.total_penalties || stats.totalPenalties || 0,
       first_putt_distances: stats.first_putt_distances || stats.firstPuttDistances || {},
       make_rate_putts: stats.make_rate_putts || stats.makeRatePutts || {},
@@ -137,8 +137,18 @@ export const statsService = {
       averageFir: data.reduce((sum, round) => sum + round.firPercentage, 0) / data.length,
       averageGir: data.reduce((sum, round) => sum + round.girPercentage, 0) / data.length,
       averagePutts: data.reduce((sum, round) => sum + round.totalPutts, 0) / data.length,
-      averageScrambling: data.reduce((sum, round) => sum + round.scramblingPercentage, 0) / data.length,
-      averageSandSave: data.reduce((sum, round) => sum + round.sandSavePercentage, 0) / data.length,
+      averageScrambling: (() => {
+        const validScrambling = data.filter(round => round.scramblingPercentage !== null);
+        return validScrambling.length > 0 
+          ? validScrambling.reduce((sum, round) => sum + round.scramblingPercentage!, 0) / validScrambling.length 
+          : null;
+      })(),
+      averageSandSave: (() => {
+        const validSandSave = data.filter(round => round.sandSavePercentage !== null);
+        return validSandSave.length > 0 
+          ? validSandSave.reduce((sum, round) => sum + round.sandSavePercentage!, 0) / validSandSave.length 
+          : null;
+      })(),
       averagePenalties: data.reduce((sum, round) => sum + round.totalPenalties, 0) / data.length,
     };
     
