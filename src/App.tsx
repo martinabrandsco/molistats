@@ -11,6 +11,7 @@ function Navigation() {
   const { user, signOut, signIn, signUp } = useAuth();
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const handleAuth = async (email: string, password: string, isSignUp: boolean) => {
     try {
@@ -33,25 +34,33 @@ function Navigation() {
 
   const handleSignOut = async () => {
     await signOut();
+    setIsMobileMenuOpen(false); // Close mobile menu after sign out
   };
 
   const openAuthModal = (mode: 'login' | 'signup') => {
     setAuthMode(mode);
     setShowAuthModal(true);
+    setIsMobileMenuOpen(false); // Close mobile menu when opening auth modal
+  };
+
+  const closeMobileMenu = () => {
+    setIsMobileMenuOpen(false);
   };
 
   return (
     <>
-      <nav className="bg-masters-green shadow-lg">
+      <nav className="bg-masters-green shadow-lg relative">
         <div className="max-w-6xl mx-auto px-4">
           <div className="flex justify-between items-center h-16">
+            {/* Logo */}
             <div className="flex items-center">
-              <Link to="/" className="text-2xl font-bold text-white">
+              <Link to="/" className="text-xl md:text-2xl font-bold text-white" onClick={closeMobileMenu}>
                 MoliStats
               </Link>
             </div>
 
-            <div className="flex items-center space-x-4">
+            {/* Desktop Navigation */}
+            <div className="hidden md:flex items-center space-x-4">
               <Link
                 to="/"
                 className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
@@ -75,10 +84,10 @@ function Navigation() {
 
               {user ? (
                 <div className="flex items-center space-x-2">
-                  <span className="text-white text-sm">{user.email}</span>
+                  <span className="text-white text-sm hidden lg:block">{user.email}</span>
                   <button
                     onClick={handleSignOut}
-                    className="text-white hover:text-masters-yellow transition-colors"
+                    className="text-white hover:text-masters-yellow transition-colors p-2 rounded"
                     title="Cerrar sesión"
                   >
                     <LogOut size={20} />
@@ -97,6 +106,90 @@ function Navigation() {
                     onClick={() => openAuthModal('signup')}
                     className="bg-masters-yellow text-masters-dark-green hover:bg-masters-gold transition-colors px-3 py-1 rounded text-sm font-medium"
                     title="Registrarse"
+                  >
+                    Registrarse
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Mobile menu button */}
+            <div className="md:hidden">
+              <button
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="text-white hover:text-masters-yellow transition-colors p-2 rounded"
+                aria-label="Toggle mobile menu"
+              >
+                <svg
+                  className={`w-6 h-6 transition-transform duration-200 ${isMobileMenuOpen ? 'rotate-90' : ''}`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  {isMobileMenuOpen ? (
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  ) : (
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                  )}
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          {/* Mobile Navigation Menu */}
+          <div className={`md:hidden transition-all duration-300 ease-in-out overflow-hidden ${
+            isMobileMenuOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+          }`}>
+            <div className="pb-4 space-y-2 border-t border-masters-light-green/30">
+              {/* Navigation Links */}
+              <Link
+                to="/"
+                className={`block px-3 py-3 rounded-md text-base font-medium transition-colors ${
+                  location.pathname === '/'
+                    ? 'bg-masters-light-green text-white'
+                    : 'text-white hover:bg-masters-light-green'
+                }`}
+                onClick={closeMobileMenu}
+              >
+                Nueva Ronda
+              </Link>
+              <Link
+                to="/stats"
+                className={`block px-3 py-3 rounded-md text-base font-medium transition-colors ${
+                  location.pathname === '/stats'
+                    ? 'bg-masters-light-green text-white'
+                    : 'text-white hover:bg-masters-light-green'
+                }`}
+                onClick={closeMobileMenu}
+              >
+                Estadísticas
+              </Link>
+
+              {/* User Section */}
+              {user ? (
+                <div className="pt-2 border-t border-masters-light-green/30">
+                  <div className="px-3 py-2">
+                    <span className="text-white text-sm font-medium">{user.email}</span>
+                  </div>
+                  <button
+                    onClick={handleSignOut}
+                    className="w-full text-left px-3 py-3 text-white hover:bg-masters-light-green transition-colors rounded-md flex items-center space-x-2"
+                  >
+                    <LogOut size={18} />
+                    <span>Cerrar Sesión</span>
+                  </button>
+                </div>
+              ) : (
+                <div className="pt-2 border-t border-masters-light-green/30 space-y-2">
+                  <button
+                    onClick={() => openAuthModal('login')}
+                    className="w-full text-left px-3 py-3 text-white hover:bg-masters-light-green transition-colors rounded-md"
+                  >
+                    Iniciar Sesión
+                  </button>
+                  <button
+                    onClick={() => openAuthModal('signup')}
+                    className="w-full text-left px-3 py-3 bg-masters-yellow text-masters-dark-green hover:bg-masters-gold transition-colors rounded-md font-medium"
                   >
                     Registrarse
                   </button>
