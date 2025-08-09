@@ -132,11 +132,36 @@ export const statsService = {
       return { data: null, error };
     }
 
+    // Separar rondas por número de hoyos
+    const rounds9Holes = data.filter(round => round.totalHoles === 9);
+    const rounds18Holes = data.filter(round => round.totalHoles === 18);
+
     const averages = {
-      averageScore: data.reduce((sum, round) => sum + round.totalScore, 0) / data.length,
+      // Estadísticas generales (todas las rondas)
+      averageScore: (() => {
+        // Normalizar score de 9 hoyos multiplicándolo por 2 para comparar con 18 hoyos
+        const normalizedScore = data.reduce((sum, round) => {
+          if (round.totalHoles === 9) {
+            return sum + (round.totalScore * 2); // Multiplicar por 2 para normalizar a 18 hoyos
+          } else {
+            return sum + round.totalScore; // 18 hoyos se mantienen igual
+          }
+        }, 0);
+        return normalizedScore / data.length;
+      })(),
       averageFir: data.reduce((sum, round) => sum + round.firPercentage, 0) / data.length,
       averageGir: data.reduce((sum, round) => sum + round.girPercentage, 0) / data.length,
-      averagePutts: data.reduce((sum, round) => sum + round.totalPutts, 0) / data.length,
+      averagePutts: (() => {
+        // Normalizar putts de 9 hoyos multiplicándolos por 2 para comparar con 18 hoyos
+        const normalizedPutts = data.reduce((sum, round) => {
+          if (round.totalHoles === 9) {
+            return sum + (round.totalPutts * 2); // Multiplicar por 2 para normalizar a 18 hoyos
+          } else {
+            return sum + round.totalPutts; // 18 hoyos se mantienen igual
+          }
+        }, 0);
+        return normalizedPutts / data.length;
+      })(),
       averageScrambling: (() => {
         const validScrambling = data.filter(round => round.scramblingPercentage !== null);
         return validScrambling.length > 0 
@@ -150,11 +175,39 @@ export const statsService = {
           : null;
       })(),
       averagePenalties: data.reduce((sum, round) => sum + round.totalPenalties, 0) / data.length,
+      
+      // Estadísticas separadas por número de hoyos
+      averageScore9Holes: rounds9Holes.length > 0 
+        ? rounds9Holes.reduce((sum, round) => sum + round.totalScore, 0) / rounds9Holes.length 
+        : null,
+      averageScore18Holes: rounds18Holes.length > 0 
+        ? rounds18Holes.reduce((sum, round) => sum + round.totalScore, 0) / rounds18Holes.length 
+        : null,
+      averageFir9Holes: rounds9Holes.length > 0 
+        ? rounds9Holes.reduce((sum, round) => sum + round.firPercentage, 0) / rounds9Holes.length 
+        : null,
+      averageFir18Holes: rounds18Holes.length > 0 
+        ? rounds18Holes.reduce((sum, round) => sum + round.firPercentage, 0) / rounds18Holes.length 
+        : null,
+      averageGir9Holes: rounds9Holes.length > 0 
+        ? rounds9Holes.reduce((sum, round) => sum + round.girPercentage, 0) / rounds9Holes.length 
+        : null,
+      averageGir18Holes: rounds18Holes.length > 0 
+        ? rounds18Holes.reduce((sum, round) => sum + round.girPercentage, 0) / rounds18Holes.length 
+        : null,
+      averagePutts9Holes: rounds9Holes.length > 0 
+        ? rounds9Holes.reduce((sum, round) => sum + round.totalPutts, 0) / rounds9Holes.length 
+        : null,
+      averagePutts18Holes: rounds18Holes.length > 0 
+        ? rounds18Holes.reduce((sum, round) => sum + round.totalPutts, 0) / rounds18Holes.length 
+        : null,
     };
     
     console.log('Calculated averages:', averages);
     console.log('Scrambling data points:', data.map(round => round.scramblingPercentage));
     console.log('Sand save data points:', data.map(round => round.sandSavePercentage));
+    console.log('9 holes rounds:', rounds9Holes.length);
+    console.log('18 holes rounds:', rounds18Holes.length);
 
     return { data: averages, error: null };
   }

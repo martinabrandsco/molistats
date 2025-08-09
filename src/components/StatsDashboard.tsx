@@ -9,6 +9,7 @@ interface StatsDashboardProps {
 }
 
 interface AverageStats {
+  // Estadísticas generales (todas las rondas)
   averageScore: number;
   averageFir: number;
   averageGir: number;
@@ -16,6 +17,16 @@ interface AverageStats {
   averageScrambling: number | null;
   averageSandSave: number | null;
   averagePenalties: number;
+  
+  // Estadísticas separadas por número de hoyos
+  averageScore9Holes: number | null;
+  averageScore18Holes: number | null;
+  averageFir9Holes: number | null;
+  averageFir18Holes: number | null;
+  averageGir9Holes: number | null;
+  averageGir18Holes: number | null;
+  averagePutts9Holes: number | null;
+  averagePutts18Holes: number | null;
 }
 
 
@@ -225,24 +236,144 @@ export function StatsDashboard({ userId }: StatsDashboardProps) {
 
       {/* Average Stats */}
       {averageStats && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="card text-center">
-            <h4 className="text-sm font-medium text-masters-dark-green mb-2">Score Promedio</h4>
-            <p className="text-3xl font-bold text-masters-green">{averageStats.averageScore?.toFixed(1) || '0.0'}</p>
+        <>
+          {/* Estadísticas Generales */}
+          <div className="card">
+            <h3 className="text-lg font-semibold text-masters-dark-green mb-4">Estadísticas Generales (Todas las Rondas)</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="card text-center">
+                <h4 className="text-sm font-medium text-masters-dark-green mb-2">Score Promedio</h4>
+                <p className="text-3xl font-bold text-masters-green">{averageStats.averageScore?.toFixed(1) || '0.0'}</p>
+                <p className="text-xs text-masters-dark-green mt-1">Normalizado a 18 hoyos</p>
+              </div>
+              <div className="card text-center">
+                <h4 className="text-sm font-medium text-masters-dark-green mb-2">FIR %</h4>
+                <p className="text-3xl font-bold text-masters-green">{averageStats.averageFir?.toFixed(1) || '0.0'}%</p>
+              </div>
+              <div className="card text-center">
+                <h4 className="text-sm font-medium text-masters-dark-green mb-2">GIR %</h4>
+                <p className="text-3xl font-bold text-masters-green">{averageStats.averageGir?.toFixed(1) || '0.0'}%</p>
+              </div>
+              <div className="card text-center">
+                <h4 className="text-sm font-medium text-masters-dark-green mb-2">Putts Promedio</h4>
+                <p className="text-3xl font-bold text-masters-green">{averageStats.averagePutts?.toFixed(1) || '0.0'}</p>
+                <p className="text-xs text-masters-dark-green mt-1">Normalizado a 18 hoyos</p>
+              </div>
+            </div>
           </div>
-          <div className="card text-center">
-            <h4 className="text-sm font-medium text-masters-dark-green mb-2">FIR %</h4>
-            <p className="text-3xl font-bold text-masters-green">{averageStats.averageFir?.toFixed(1) || '0.0'}%</p>
+
+          {/* Estadísticas por Número de Hoyos */}
+          <div className="card">
+            <h3 className="text-lg font-semibold text-masters-dark-green mb-4">Estadísticas por Número de Hoyos</h3>
+            
+            {/* Score por Número de Hoyos */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+              <div className="text-center">
+                <h4 className="text-lg font-medium text-masters-dark-green mb-3">Rondas de 9 Hoyos</h4>
+                <div className="grid grid-cols-1 gap-3">
+                  <div className="card text-center">
+                    <h5 className="text-sm font-medium text-masters-dark-green mb-1">Score Promedio</h5>
+                    <p className="text-2xl font-bold text-masters-green">
+                      {averageStats.averageScore9Holes !== null ? averageStats.averageScore9Holes.toFixed(1) : 'N/A'}
+                    </p>
+                  </div>
+                  <div className="card text-center">
+                    <h5 className="text-sm font-medium text-masters-dark-green mb-1">FIR %</h5>
+                    <p className="text-xl font-bold text-masters-green">
+                      {averageStats.averageFir9Holes !== null ? `${averageStats.averageFir9Holes.toFixed(1)}%` : 'N/A'}
+                    </p>
+                  </div>
+                  <div className="card text-center">
+                    <h5 className="text-sm font-medium text-masters-dark-green mb-1">GIR %</h5>
+                    <p className="text-xl font-bold text-masters-green">
+                      {averageStats.averageGir9Holes !== null ? `${averageStats.averageGir9Holes.toFixed(1)}%` : 'N/A'}
+                    </p>
+                  </div>
+                  <div className="card text-center">
+                    <h5 className="text-sm font-medium text-masters-dark-green mb-1">Putts Promedio</h5>
+                    <p className="text-xl font-bold text-masters-green">
+                      {averageStats.averagePutts9Holes !== null ? averageStats.averagePutts9Holes.toFixed(1) : 'N/A'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="text-center">
+                <h4 className="text-lg font-medium text-masters-dark-green mb-3">Rondas de 18 Hoyos</h4>
+                <div className="grid grid-cols-1 gap-3">
+                  <div className="card text-center">
+                    <h5 className="text-sm font-medium text-masters-dark-green mb-1">Score Promedio</h5>
+                    <p className="text-2xl font-bold text-masters-green">
+                      {averageStats.averageScore18Holes !== null ? averageStats.averageScore18Holes.toFixed(1) : 'N/A'}
+                    </p>
+                  </div>
+                  <div className="card text-center">
+                    <h5 className="text-sm font-medium text-masters-dark-green mb-1">FIR %</h5>
+                    <p className="text-xl font-bold text-masters-green">
+                      {averageStats.averageFir18Holes !== null ? `${averageStats.averageFir18Holes.toFixed(1)}%` : 'N/A'}
+                    </p>
+                  </div>
+                  <div className="card text-center">
+                    <h5 className="text-sm font-medium text-masters-dark-green mb-1">GIR %</h5>
+                    <p className="text-xl font-bold text-masters-green">
+                      {averageStats.averageGir18Holes !== null ? `${averageStats.averageGir18Holes.toFixed(1)}%` : 'N/A'}
+                    </p>
+                  </div>
+                  <div className="card text-center">
+                    <h5 className="text-sm font-medium text-masters-dark-green mb-1">Putts Promedio</h5>
+                    <p className="text-xl font-bold text-masters-green">
+                      {averageStats.averagePutts18Holes !== null ? averageStats.averagePutts18Holes.toFixed(1) : 'N/A'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Diferencia entre Rondas de 9 y 18 Hoyos */}
+            {averageStats.averageScore9Holes !== null && averageStats.averageScore18Holes !== null && (
+              <div className="card">
+                <h4 className="text-lg font-medium text-masters-dark-green mb-4 text-center">Comparación: 9 vs 18 Hoyos</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="text-center">
+                    <h5 className="text-sm font-medium text-masters-dark-green mb-2">Diferencia en Score</h5>
+                    {(() => {
+                      const scoreDiff = averageStats.averageScore9Holes! - averageStats.averageScore18Holes!;
+                      const isBetter = scoreDiff < 0;
+                      return (
+                        <div className="flex items-center justify-center space-x-2">
+                          <span className={`text-2xl font-bold ${isBetter ? 'text-green-600' : 'text-red-600'}`}>
+                            {isBetter ? '↓' : '↑'} {Math.abs(scoreDiff).toFixed(1)}
+                          </span>
+                          <span className="text-sm text-masters-dark-green">
+                            {isBetter ? 'Mejor en 9 hoyos' : 'Mejor en 18 hoyos'}
+                          </span>
+                        </div>
+                      );
+                    })()}
+                  </div>
+                  
+                  <div className="text-center">
+                    <h5 className="text-sm font-medium text-masters-dark-green mb-2">Diferencia en Putts</h5>
+                    {(() => {
+                      const puttsDiff = averageStats.averagePutts9Holes! - averageStats.averagePutts18Holes!;
+                      const isBetter = puttsDiff < 0;
+                      return (
+                        <div className="flex items-center justify-center space-x-2">
+                          <span className={`text-2xl font-bold ${isBetter ? 'text-green-600' : 'text-red-600'}`}>
+                            {isBetter ? '↓' : '↑'} {Math.abs(puttsDiff).toFixed(1)}
+                          </span>
+                          <span className="text-sm text-masters-dark-green">
+                            {isBetter ? 'Mejor en 9 hoyos' : 'Mejor en 18 hoyos'}
+                          </span>
+                        </div>
+                      );
+                    })()}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
-          <div className="card text-center">
-            <h4 className="text-sm font-medium text-masters-dark-green mb-2">GIR %</h4>
-            <p className="text-3xl font-bold text-masters-green">{averageStats.averageGir?.toFixed(1) || '0.0'}%</p>
-          </div>
-          <div className="card text-center">
-            <h4 className="text-sm font-medium text-masters-dark-green mb-2">Putts Promedio</h4>
-            <p className="text-3xl font-bold text-masters-green">{averageStats.averagePutts?.toFixed(1) || '0.0'}</p>
-          </div>
-        </div>
+        </>
       )}
 
       {/* GIR by Distance Chart */}
