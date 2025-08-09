@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { useState, useEffect, useMemo } from 'react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { statsService } from '../services/supabase';
 import { FilterOption, RoundStats } from '../types';
 import { DISTANCE_INTERVALS } from '../utils/statsCalculator';
@@ -18,7 +18,7 @@ interface AverageStats {
   averagePenalties: number;
 }
 
-const COLORS = ['#0F5132', '#1A5F3A', '#FFD700', '#DAA520', '#F5F5DC'];
+
 
 export function StatsDashboard({ userId }: StatsDashboardProps) {
   const [filter, setFilter] = useState<FilterOption>('Todas');
@@ -173,12 +173,7 @@ export function StatsDashboard({ userId }: StatsDashboardProps) {
       });
   }, [roundStats]);
 
-  const puttDistanceData = [
-    { name: '4-6 ft', value: averageStats?.averagePutts || 0 },
-    { name: '7-10 ft', value: averageStats?.averagePutts || 0 },
-    { name: '11-16 ft', value: averageStats?.averagePutts || 0 },
-    { name: '17-30 ft', value: averageStats?.averagePutts || 0 },
-  ];
+
 
   if (loading) {
     return (
@@ -260,7 +255,7 @@ export function StatsDashboard({ userId }: StatsDashboardProps) {
               <XAxis dataKey="name" />
               <YAxis />
               <Tooltip 
-                formatter={(value: any, name: any) => [`${value.toFixed(1)}%`, 'Porcentaje GIR']}
+                formatter={(value: any, _name: any) => [`${value.toFixed(1)}%`, 'Porcentaje GIR']}
                 labelFormatter={(label) => `Rango: ${label}`}
               />
               <Bar dataKey="percentage" fill="#0F5132" />
@@ -279,7 +274,7 @@ export function StatsDashboard({ userId }: StatsDashboardProps) {
               <XAxis dataKey="name" />
               <YAxis />
               <Tooltip 
-                formatter={(value: any, name: any) => [`${value} ft`, 'Distancia Promedio']}
+                formatter={(value: any, _name: any) => [`${value} ft`, 'Distancia Promedio']}
                 labelFormatter={(label) => `Rango: ${label}`}
               />
               <Bar dataKey="averageDistance" fill="#D4AF37" />
@@ -298,7 +293,7 @@ export function StatsDashboard({ userId }: StatsDashboardProps) {
               <XAxis dataKey="name" />
               <YAxis />
               <Tooltip 
-                formatter={(value: any, name: any) => [`${value.toFixed(1)}%`, 'Porcentaje de Acierto']}
+                formatter={(value: any, _name: any) => [`${value.toFixed(1)}%`, 'Porcentaje de Acierto']}
                 labelFormatter={(label) => `Rango: ${label}`}
               />
               <Bar dataKey="value" fill="#0F5132" />

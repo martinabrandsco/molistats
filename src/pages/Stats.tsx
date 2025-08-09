@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { StatsDashboard } from '../components/StatsDashboard';
 import { useAuth } from '../hooks/useAuth';
 import { LogIn } from 'lucide-react';

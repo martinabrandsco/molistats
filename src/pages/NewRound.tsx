@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { HoleForm } from '../components/HoleForm';
 import { HoleStats } from '../types';
 import { calculateRoundStats } from '../utils/statsCalculator';
@@ -133,18 +133,12 @@ export function NewRound() {
     }
   };
 
-  const handleAuthSuccess = () => {
-    setShowAuthModal(false);
-    // Retry saving the round
-    if (holeStats.length === totalHoles) {
-      handleRoundComplete(holeStats);
-    }
-  };
+
 
   const handleAuth = async (email: string, password: string, isSignUp: boolean) => {
     try {
       if (isSignUp) {
-        const { data, error } = await authService.signUp(email, password);
+        const { error } = await authService.signUp(email, password);
         if (error) {
           return { error };
         }
@@ -152,7 +146,7 @@ export function NewRound() {
         const { error: signInError } = await authService.signIn(email, password);
         return { error: signInError };
       } else {
-        const { data, error } = await authService.signIn(email, password);
+        const { error } = await authService.signIn(email, password);
         return { error };
       }
     } catch (error) {
@@ -213,7 +207,7 @@ export function NewRound() {
                     name="totalHoles"
                     value="9"
                     checked={totalHoles === 9}
-                    onChange={(e) => setTotalHoles(9)}
+                    onChange={() => setTotalHoles(9)}
                     className="mr-2 text-masters-green focus:ring-masters-green"
                   />
                   <span className="text-masters-dark-green">9 hoyos</span>
@@ -224,7 +218,7 @@ export function NewRound() {
                     name="totalHoles"
                     value="18"
                     checked={totalHoles === 18}
-                    onChange={(e) => setTotalHoles(18)}
+                    onChange={() => setTotalHoles(18)}
                     className="mr-2 text-masters-green focus:ring-masters-green"
                   />
                   <span className="text-masters-dark-green">18 hoyos</span>

@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
 import { NewRound } from './pages/NewRound';
 import { Stats } from './pages/Stats';
 import { useAuth } from './hooks/useAuth';
 import { AuthModal } from './components/AuthModal';
-import { LogOut, User } from 'lucide-react';
+import { LogOut } from 'lucide-react';
 
 function Navigation() {
   const location = useLocation();
@@ -15,7 +15,7 @@ function Navigation() {
   const handleAuth = async (email: string, password: string, isSignUp: boolean) => {
     try {
       if (isSignUp) {
-        const { data, error } = await signUp(email, password);
+        const { error } = await signUp(email, password);
         if (error) {
           return { error };
         }
@@ -23,7 +23,7 @@ function Navigation() {
         const { error: signInError } = await signIn(email, password);
         return { error: signInError };
       } else {
-        const { data, error } = await signIn(email, password);
+        const { error } = await signIn(email, password);
         return { error };
       }
     } catch (error) {

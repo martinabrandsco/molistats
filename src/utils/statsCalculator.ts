@@ -101,18 +101,18 @@ export function calculateRoundStats(holes: HoleStats[], courseName: string): Rou
   
   return {
     timestamp: new Date().toISOString(),
-    course_name: courseName,
-    total_holes: totalHoles,
-    total_score: totalScore,
-    fir_percentage: firPercentage,
-    gir_percentage: girPercentage,
-    gir_by_distance: girByDistance,
-    total_putts: totalPutts,
-    scrambling_percentage: scramblingPercentage,
-    sand_save_percentage: sandSavePercentage,
-    total_penalties: totalPenalties,
-    first_putt_distances: firstPuttDistances,
-    make_rate_putts: makeRatePutts,
+    courseName: courseName,
+    totalHoles: totalHoles,
+    totalScore: totalScore,
+    firPercentage: firPercentage,
+    girPercentage: girPercentage,
+    girByDistance: girByDistance,
+    totalPutts: totalPutts,
+    scramblingPercentage: scramblingPercentage,
+    sandSavePercentage: sandSavePercentage,
+    totalPenalties: totalPenalties,
+    firstPuttDistances: firstPuttDistances,
+    makeRatePutts: makeRatePutts,
   };
 }
 
