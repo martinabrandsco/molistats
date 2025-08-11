@@ -50,8 +50,8 @@ export const statsService = {
       gir_percentage: stats.gir_percentage || stats.girPercentage || 0,
       gir_by_distance: stats.gir_by_distance || stats.girByDistance || {},
       total_putts: stats.total_putts || stats.totalPutts || 0,
-      scrambling_percentage: stats.scrambling_percentage !== undefined ? stats.scrambling_percentage : (stats.scramblingPercentage !== undefined ? stats.scramblingPercentage : null),
-      sand_save_percentage: stats.sand_save_percentage !== undefined ? stats.sand_save_percentage : (stats.sandSavePercentage !== undefined ? stats.sandSavePercentage : null),
+      scrambling_percentage: stats.scrambling_percentage !== undefined ? stats.scrambling_percentage : (stats.scramblingPercentage !== undefined ? stats.scramblingPercentage : 0),
+      sand_save_percentage: stats.sand_save_percentage !== undefined ? stats.sand_save_percentage : (stats.sandSavePercentage !== undefined ? stats.sandSavePercentage : 0),
       total_penalties: stats.total_penalties || stats.totalPenalties || 0,
       first_putt_distances: stats.first_putt_distances || stats.firstPuttDistances || {},
       make_rate_putts: stats.make_rate_putts || stats.makeRatePutts || {},
@@ -163,13 +163,13 @@ export const statsService = {
         return normalizedPutts / data.length;
       })(),
       averageScrambling: (() => {
-        const validScrambling = data.filter(round => round.scramblingPercentage !== null);
+        const validScrambling = data.filter(round => round.scramblingPercentage !== null && round.scramblingPercentage !== undefined);
         return validScrambling.length > 0 
           ? validScrambling.reduce((sum, round) => sum + round.scramblingPercentage!, 0) / validScrambling.length 
           : null;
       })(),
       averageSandSave: (() => {
-        const validSandSave = data.filter(round => round.sandSavePercentage !== null);
+        const validSandSave = data.filter(round => round.sandSavePercentage !== null && round.sandSavePercentage !== undefined);
         return validSandSave.length > 0 
           ? validSandSave.reduce((sum, round) => sum + round.sandSavePercentage!, 0) / validSandSave.length 
           : null;
