@@ -162,18 +162,8 @@ export const statsService = {
         }, 0);
         return normalizedPutts / data.length;
       })(),
-      averageScrambling: (() => {
-        const validScrambling = data.filter(round => round.scramblingPercentage !== null && round.scramblingPercentage !== undefined);
-        return validScrambling.length > 0 
-          ? validScrambling.reduce((sum, round) => sum + round.scramblingPercentage!, 0) / validScrambling.length 
-          : null;
-      })(),
-      averageSandSave: (() => {
-        const validSandSave = data.filter(round => round.sandSavePercentage !== null && round.sandSavePercentage !== undefined);
-        return validSandSave.length > 0 
-          ? validSandSave.reduce((sum, round) => sum + round.sandSavePercentage!, 0) / validSandSave.length 
-          : null;
-      })(),
+      averageScrambling: data.reduce((sum, round) => sum + round.scramblingPercentage, 0) / data.length,
+      averageSandSave: data.reduce((sum, round) => sum + round.sandSavePercentage, 0) / data.length,
       averagePenalties: data.reduce((sum, round) => sum + round.totalPenalties, 0) / data.length,
       
       // Estadísticas separadas por número de hoyos

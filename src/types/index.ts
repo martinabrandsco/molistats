@@ -29,8 +29,8 @@ export interface RoundStats {
     };
   };
   totalPutts: number;
-  scramblingPercentage: number | null;
-  sandSavePercentage: number | null;
+  scramblingPercentage: number;
+  sandSavePercentage: number;
   totalPenalties: number;
   firstPuttDistances: {
     '4-6ft': number;

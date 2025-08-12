@@ -14,8 +14,8 @@ interface AverageStats {
   averageFir: number;
   averageGir: number;
   averagePutts: number;
-  averageScrambling: number | null;
-  averageSandSave: number | null;
+  averageScrambling: number;
+  averageSandSave: number;
   averagePenalties: number;
   
   // Estadísticas separadas por número de hoyos
@@ -439,13 +439,13 @@ export function StatsDashboard({ userId }: StatsDashboardProps) {
           <div className="card text-center">
             <h4 className="text-sm font-medium text-masters-dark-green mb-2">Scrambling %</h4>
             <p className="text-2xl font-bold text-masters-green">
-              {averageStats.averageScrambling !== null ? `${averageStats.averageScrambling.toFixed(1)}%` : 'N/A'}
+              {averageStats.averageScrambling.toFixed(1)}%
             </p>
           </div>
           <div className="card text-center">
             <h4 className="text-sm font-medium text-masters-dark-green mb-2">Sand Save %</h4>
             <p className="text-2xl font-bold text-masters-green">
-              {averageStats.averageSandSave !== null ? `${averageStats.averageSandSave.toFixed(1)}%` : 'N/A'}
+              {averageStats.averageSandSave.toFixed(1)}%
             </p>
           </div>
           <div className="card text-center">
