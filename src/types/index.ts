@@ -41,6 +41,11 @@ export interface RoundStats {
   makeRatePutts: {
     [key: string]: number;
   };
+  averageScoreByPar: {
+    par3: number;
+    par4: number;
+    par5: number;
+  };
   userId?: string;
 }
 

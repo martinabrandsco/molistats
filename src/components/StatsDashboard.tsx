@@ -1,8 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { statsService } from '../services/supabase';
-import { FilterOption, RoundStats } from '../types';
-import { DISTANCE_INTERVALS } from '../utils/statsCalculator';
+import { RoundStats, FilterOption } from '../types';
 
 interface StatsDashboardProps {
   userId: string;
@@ -27,8 +26,26 @@ interface AverageStats {
   averageGir18Holes: number | null;
   averagePutts9Holes: number | null;
   averagePutts18Holes: number | null;
-}
+  
+  // Media de golpes por tipo de par
+  averageScoreByPar: {
+    par3: number;
+    par4: number;
+    par5: number;
+  };
 
+  // Data for charts
+  girByDistance?: {
+    total: number;
+    gir: number;
+    percentage: number;
+    averageFirstPuttDistance: number;
+  }[];
+
+  makeRatePutts?: {
+    [key: string]: number;
+  };
+}
 
 
 export function StatsDashboard({ userId }: StatsDashboardProps) {
@@ -89,101 +106,48 @@ export function StatsDashboard({ userId }: StatsDashboardProps) {
     }
   };
 
-  const girByDistanceData = DISTANCE_INTERVALS.map(interval => {
-    const total = roundStats.reduce((sum, round) => 
-      sum + (round.girByDistance?.[interval.label]?.total || 0), 0
-    );
-    const gir = roundStats.reduce((sum, round) => 
-      sum + (round.girByDistance?.[interval.label]?.gir || 0), 0
-    );
-    return {
-      name: interval.label,
-      total,
-      gir,
-      percentage: total > 0 ? (gir / total) * 100 : 0
-    };
-  }).filter(item => item.total > 0);
+  // Prepare data for charts
+  const girByDistanceData = useMemo(() => {
+    if (!averageStats?.girByDistance) return [];
+    
+    return Object.entries(averageStats.girByDistance).map(([range, data]) => ({
+      range,
+      total: data.total,
+      gir: data.gir,
+      percentage: data.percentage,
+      averageFirstPuttDistance: data.averageFirstPuttDistance
+    }));
+  }, [averageStats?.girByDistance]);
 
   const averageFirstPuttDistanceData = useMemo(() => {
-    if (!roundStats || roundStats.length === 0) return [];
+    if (!averageStats?.girByDistance) return [];
     
-    console.log('Calculating averageFirstPuttDistanceData with roundStats:', roundStats);
-    
-    // Aggregate average first putt distances by GIR distance range across all rounds
-    const aggregated: { [key: string]: { totalDistance: number; count: number } } = {};
-    
-    roundStats.forEach(round => {
-      console.log('Processing round:', round.courseName);
-      console.log('Round girByDistance:', round.girByDistance);
-      
-      if (round.girByDistance) {
-        Object.entries(round.girByDistance).forEach(([distance, data]: [string, any]) => {
-          console.log(`Distance ${distance}:`, data);
-          
-          if (!aggregated[distance]) {
-            aggregated[distance] = { totalDistance: 0, count: 0 };
-          }
-          // Only include ranges where there are actual GIR holes
-          if (data.gir > 0 && data.averageFirstPuttDistance > 0) {
-            console.log(`Adding to ${distance}: distance=${data.averageFirstPuttDistance}, count=${data.gir}`);
-            aggregated[distance].totalDistance += data.averageFirstPuttDistance * data.gir;
-            aggregated[distance].count += data.gir;
-          }
-        });
-      }
-    });
-    
-    console.log('Final aggregated data:', aggregated);
-    
-    const result = Object.entries(aggregated)
-      .filter(([_, data]) => data.count > 0)
-      .map(([distance, data]) => ({
-        name: distance,
-        averageDistance: Math.round((data.totalDistance / data.count) * 10) / 10
-      }))
-      .sort((a, b) => {
-        // Sort by distance range (extract numbers for proper sorting)
-        const aNum = parseInt(a.name.split('-')[0]);
-        const bNum = parseInt(b.name.split('-')[0]);
-        return aNum - bNum;
-      });
-    
-    console.log('Final result:', result);
-    return result;
-  }, [roundStats]);
+    return Object.entries(averageStats.girByDistance)
+      .filter(([_, data]) => data.averageFirstPuttDistance > 0)
+      .map(([range, data]) => ({
+        range,
+        averageDistance: data.averageFirstPuttDistance
+      }));
+  }, [averageStats?.girByDistance]);
 
   const makeRatePuttsData = useMemo(() => {
-    if (!roundStats || roundStats.length === 0) return [];
+    if (!averageStats?.makeRatePutts) return [];
     
-    // Aggregate make rate putts across all rounds
-    const aggregated: { [key: string]: { total: number; made: number } } = {};
-    
-    roundStats.forEach(round => {
-      if (round.makeRatePutts) {
-        Object.entries(round.makeRatePutts).forEach(([distance, percentage]: [string, any]) => {
-          if (!aggregated[distance]) {
-            aggregated[distance] = { total: 0, made: 0 };
-          }
-          // Since we now only store ranges with actual putts, we can calculate the average percentage
-          aggregated[distance].total += 1;
-          aggregated[distance].made += percentage || 0;
-        });
-      }
-    });
-    
-    return Object.entries(aggregated)
-      .map(([distance, data]) => ({
-        name: distance,
-        value: data.total > 0 ? (data.made / data.total) : 0
-      }))
-      .sort((a, b) => {
-        // Sort by distance range (extract numbers for proper sorting)
-        const aNum = parseInt(a.name.split('-')[0]);
-        const bNum = parseInt(b.name.split('-')[0]);
-        return aNum - bNum;
-      });
-  }, [roundStats]);
+    return Object.entries(averageStats.makeRatePutts).map(([range, percentage]) => ({
+      range,
+      percentage
+    }));
+  }, [averageStats?.makeRatePutts]);
 
+  const averageScoreByParData = useMemo(() => {
+    if (!averageStats?.averageScoreByPar) return [];
+    
+    return [
+      { par: 'Par 3', average: averageStats.averageScoreByPar.par3 },
+      { par: 'Par 4', average: averageStats.averageScoreByPar.par4 },
+      { par: 'Par 5', average: averageStats.averageScoreByPar.par5 }
+    ];
+  }, [averageStats?.averageScoreByPar]);
 
 
   if (loading) {
@@ -383,7 +347,7 @@ export function StatsDashboard({ userId }: StatsDashboardProps) {
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={girByDistanceData}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
+              <XAxis dataKey="range" />
               <YAxis />
               <Tooltip 
                 formatter={(value: any, _name: any) => [`${value.toFixed(1)}%`, 'Porcentaje GIR']}
@@ -396,13 +360,13 @@ export function StatsDashboard({ userId }: StatsDashboardProps) {
       )}
 
       {/* Average First Putt Distance by GIR Distance Range Chart */}
-      {roundStats.length > 0 && (
+      {averageFirstPuttDistanceData.length > 0 && (
         <div className="card">
           <h3 className="text-lg font-semibold text-masters-dark-green mb-4">Distancia Promedio al Hoyo por Rango de GIR</h3>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={averageFirstPuttDistanceData}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
+              <XAxis dataKey="range" />
               <YAxis />
               <Tooltip 
                 formatter={(value: any, _name: any) => [`${value} ft`, 'Distancia Promedio']}
@@ -415,19 +379,38 @@ export function StatsDashboard({ userId }: StatsDashboardProps) {
       )}
 
       {/* Make Rate Putts Chart */}
-      {roundStats.length > 0 && (
+      {makeRatePuttsData.length > 0 && (
         <div className="card">
           <h3 className="text-lg font-semibold text-masters-dark-green mb-4">Porcentaje de Acierto por Distancia de Putt (Solo Rangos con Putts)</h3>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={makeRatePuttsData}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
+              <XAxis dataKey="range" />
               <YAxis />
               <Tooltip 
                 formatter={(value: any, _name: any) => [`${value.toFixed(1)}%`, 'Porcentaje de Acierto']}
                 labelFormatter={(label) => `Rango: ${label}`}
               />
-              <Bar dataKey="value" fill="#0F5132" />
+              <Bar dataKey="percentage" fill="#0F5132" />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      )}
+
+      {/* Average Score by Par Chart */}
+      {averageScoreByParData.length > 0 && (
+        <div className="card">
+          <h3 className="text-lg font-semibold text-masters-dark-green mb-4">Puntuación Promedio por Tipo de Par</h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={averageScoreByParData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="par" />
+              <YAxis />
+              <Tooltip 
+                formatter={(value: any, _name: any) => [`${value.toFixed(1)}`, 'Puntuación Promedio']}
+                labelFormatter={(label) => `Tipo de Par: ${label}`}
+              />
+              <Bar dataKey="average" fill="#D4AF37" />
             </BarChart>
           </ResponsiveContainer>
         </div>

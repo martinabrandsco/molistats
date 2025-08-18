@@ -101,6 +101,17 @@ export function calculateRoundStats(holes: HoleStats[], courseName: string): Rou
     }
   });
   
+  // Calculate average score by par type
+  const par3Holes = holes.filter(hole => hole.par === 3);
+  const par4Holes = holes.filter(hole => hole.par === 4);
+  const par5Holes = holes.filter(hole => hole.par === 5);
+  
+  const averageScoreByPar = {
+    par3: par3Holes.length > 0 ? par3Holes.reduce((sum, hole) => sum + hole.score, 0) / par3Holes.length : 0,
+    par4: par4Holes.length > 0 ? par4Holes.reduce((sum, hole) => sum + hole.score, 0) / par4Holes.length : 0,
+    par5: par5Holes.length > 0 ? par5Holes.reduce((sum, hole) => sum + hole.score, 0) / par5Holes.length : 0,
+  };
+  
   return {
     timestamp: new Date().toISOString(),
     courseName: courseName,
@@ -115,6 +126,7 @@ export function calculateRoundStats(holes: HoleStats[], courseName: string): Rou
     totalPenalties: totalPenalties,
     firstPuttDistances: firstPuttDistances,
     makeRatePutts: makeRatePutts,
+    averageScoreByPar: averageScoreByPar,
   };
 }
 

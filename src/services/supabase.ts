@@ -54,8 +54,9 @@ export const statsService = {
       sand_save_percentage: stats.sand_save_percentage !== undefined ? stats.sand_save_percentage : (stats.sandSavePercentage !== undefined ? stats.sandSavePercentage : 0),
       total_penalties: stats.total_penalties || stats.totalPenalties || 0,
       first_putt_distances: stats.first_putt_distances || stats.firstPuttDistances || {},
-      make_rate_putts: stats.make_rate_putts || stats.makeRatePutts || {},
-      user_id: stats.user_id || stats.userId,
+      make_rate_putts: stats.makeRatePutts || {},
+      average_score_by_par: stats.averageScoreByPar,
+      user_id: stats.userId,
       timestamp: stats.timestamp || new Date().toISOString()
     };
 
@@ -107,7 +108,8 @@ export const statsService = {
         sandSavePercentage: round.sand_save_percentage,
         totalPenalties: round.total_penalties,
         firstPuttDistances: round.first_putt_distances,
-        makeRatePutts: round.make_rate_putts,
+        makeRatePutts: round.make_rate_putts || {},
+        averageScoreByPar: round.average_score_by_par || { par3: 0, par4: 0, par5: 0 },
         userId: round.user_id
       };
       console.log('Mapped round data:', mapped);
@@ -167,30 +169,82 @@ export const statsService = {
       averagePenalties: data.reduce((sum, round) => sum + round.totalPenalties, 0) / data.length,
       
       // Estadísticas separadas por número de hoyos
-      averageScore9Holes: rounds9Holes.length > 0 
-        ? rounds9Holes.reduce((sum, round) => sum + round.totalScore, 0) / rounds9Holes.length 
-        : null,
-      averageScore18Holes: rounds18Holes.length > 0 
-        ? rounds18Holes.reduce((sum, round) => sum + round.totalScore, 0) / rounds18Holes.length 
-        : null,
-      averageFir9Holes: rounds9Holes.length > 0 
-        ? rounds9Holes.reduce((sum, round) => sum + round.firPercentage, 0) / rounds9Holes.length 
-        : null,
-      averageFir18Holes: rounds18Holes.length > 0 
-        ? rounds18Holes.reduce((sum, round) => sum + round.firPercentage, 0) / rounds18Holes.length 
-        : null,
-      averageGir9Holes: rounds9Holes.length > 0 
-        ? rounds9Holes.reduce((sum, round) => sum + round.girPercentage, 0) / rounds9Holes.length 
-        : null,
-      averageGir18Holes: rounds18Holes.length > 0 
-        ? rounds18Holes.reduce((sum, round) => sum + round.girPercentage, 0) / rounds18Holes.length 
-        : null,
-      averagePutts9Holes: rounds9Holes.length > 0 
-        ? rounds9Holes.reduce((sum, round) => sum + round.totalPutts, 0) / rounds9Holes.length 
-        : null,
-      averagePutts18Holes: rounds18Holes.length > 0 
-        ? rounds18Holes.reduce((sum, round) => sum + round.totalPutts, 0) / rounds18Holes.length 
-        : null,
+      averageScore9Holes: (() => {
+        const rounds9Holes = data.filter(round => round.totalHoles === 9);
+        return rounds9Holes.length > 0 
+          ? rounds9Holes.reduce((sum, round) => sum + round.totalScore, 0) / rounds9Holes.length 
+          : null;
+      })(),
+      averageScore18Holes: (() => {
+        const rounds18Holes = data.filter(round => round.totalHoles === 18);
+        return rounds18Holes.length > 0 
+          ? rounds18Holes.reduce((sum, round) => sum + round.totalScore, 0) / rounds18Holes.length 
+          : null;
+      })(),
+      averageFir9Holes: (() => {
+        const rounds9Holes = data.filter(round => round.totalHoles === 9);
+        return rounds9Holes.length > 0 
+          ? rounds9Holes.reduce((sum, round) => sum + round.firPercentage, 0) / rounds9Holes.length 
+          : null;
+      })(),
+      averageFir18Holes: (() => {
+        const rounds18Holes = data.filter(round => round.totalHoles === 18);
+        return rounds18Holes.length > 0 
+          ? rounds18Holes.reduce((sum, round) => sum + round.firPercentage, 0) / rounds18Holes.length 
+          : null;
+      })(),
+      averageGir9Holes: (() => {
+        const rounds9Holes = data.filter(round => round.totalHoles === 9);
+        return rounds9Holes.length > 0 
+          ? rounds9Holes.reduce((sum, round) => sum + round.girPercentage, 0) / rounds9Holes.length 
+          : null;
+      })(),
+      averageGir18Holes: (() => {
+        const rounds18Holes = data.filter(round => round.totalHoles === 18);
+        return rounds18Holes.length > 0 
+          ? rounds18Holes.reduce((sum, round) => sum + round.girPercentage, 0) / rounds18Holes.length 
+          : null;
+      })(),
+      averagePutts9Holes: (() => {
+        const rounds9Holes = data.filter(round => round.totalHoles === 9);
+        return rounds9Holes.length > 0 
+          ? rounds9Holes.reduce((sum, round) => sum + round.totalPutts, 0) / rounds9Holes.length 
+          : null;
+      })(),
+      averagePutts18Holes: (() => {
+        const rounds18Holes = data.filter(round => round.totalHoles === 18);
+        return rounds18Holes.length > 0 
+          ? rounds18Holes.reduce((sum, round) => sum + round.totalPutts, 0) / rounds18Holes.length 
+          : null;
+      })(),
+      
+      // Media de golpes por tipo de par
+      averageScoreByPar: (() => {
+        const allPar3Scores = data.flatMap(round => {
+          if (round.averageScoreByPar && round.averageScoreByPar.par3 > 0) {
+            return Array(round.totalHoles).fill(round.averageScoreByPar.par3);
+          }
+          return [];
+        });
+        const allPar4Scores = data.flatMap(round => {
+          if (round.averageScoreByPar && round.averageScoreByPar.par4 > 0) {
+            return Array(round.totalHoles).fill(round.averageScoreByPar.par4);
+          }
+          return [];
+        });
+        const allPar5Scores = data.flatMap(round => {
+          if (round.averageScoreByPar && round.averageScoreByPar.par5 > 0) {
+            return Array(round.totalHoles).fill(round.averageScoreByPar.par5);
+          }
+          return [];
+        });
+        
+        return {
+          par3: allPar3Scores.length > 0 ? allPar3Scores.reduce((sum, score) => sum + score, 0) / allPar3Scores.length : 0,
+          par4: allPar4Scores.length > 0 ? allPar4Scores.reduce((sum, score) => sum + score, 0) / allPar4Scores.length : 0,
+          par5: allPar5Scores.length > 0 ? allPar5Scores.reduce((sum, score) => sum + score, 0) / allPar5Scores.length : 0,
+        };
+      })()
     };
     
     console.log('Calculated averages:', averages);
