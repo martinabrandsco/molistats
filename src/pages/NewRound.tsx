@@ -54,6 +54,10 @@ export function NewRound() {
       return;
     }
 
+    console.log('Current user (complete):', user);
+    console.log('User ID (complete):', user.id);
+    console.log('User ID type (complete):', typeof user.id);
+
     setIsSaving(true);
     
     try {
@@ -62,7 +66,7 @@ export function NewRound() {
       
       const { error } = await statsService.saveRoundStats({
         ...roundStats,
-        user_id: user.id
+        userId: user.id
       });
       
       if (error) {
@@ -94,6 +98,10 @@ export function NewRound() {
       return;
     }
 
+    console.log('Current user:', user);
+    console.log('User ID:', user.id);
+    console.log('User ID type:', typeof user.id);
+
     if (holeStats.length === 0) {
       alert('No hay estadísticas para guardar. Completa al menos un hoyo.');
       return;
@@ -107,7 +115,7 @@ export function NewRound() {
       
       const { error } = await statsService.saveRoundStats({
         ...roundStats,
-        user_id: user.id
+        userId: user.id
       });
       
       if (error) {
