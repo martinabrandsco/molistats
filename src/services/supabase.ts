@@ -3,9 +3,6 @@ import { createClient } from '@supabase/supabase-js';
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://your-project.supabase.co';
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'your-anon-key';
 
-console.log('Supabase URL:', supabaseUrl);
-console.log('Supabase Anon Key:', supabaseAnonKey ? `${supabaseAnonKey.substring(0, 20)}...` : 'NOT SET');
-
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 export const authService = {
@@ -63,22 +60,6 @@ export const statsService = {
       timestamp: stats.timestamp || new Date().toISOString()
     };
 
-    console.log('Mapped stats for database:', mappedStats);
-    console.log('Scrambling percentage:', mappedStats.scrambling_percentage);
-    console.log('Sand save percentage:', mappedStats.sand_save_percentage);
-    console.log('GIR by distance:', mappedStats.gir_by_distance);
-    console.log('User ID being sent:', mappedStats.user_id);
-    console.log('User ID type:', typeof mappedStats.user_id);
-    console.log('Original user_id from stats:', stats.user_id);
-    console.log('Original userId from stats:', stats.userId);
-    console.log('Stats object keys:', Object.keys(stats));
-    console.log('Full stats object:', stats);
-
-    // Verificar el estado de autenticación
-    const { data: { user: currentUser } } = await supabase.auth.getUser();
-    console.log('Current authenticated user:', currentUser);
-    console.log('User ID from auth:', currentUser?.id);
-
     const { data, error } = await supabase
       .from('round_stats')
       .insert([mappedStats])
@@ -107,7 +88,6 @@ export const statsService = {
 
     // Map snake_case to camelCase
     const mappedData = data?.map(round => {
-      console.log('Raw round data:', round);
       const mapped = {
         id: round.id,
         timestamp: round.timestamp,
@@ -126,8 +106,6 @@ export const statsService = {
         averageScoreByPar: round.average_score_by_par || { par3: 0, par4: 0, par5: 0 },
         userId: round.user_id
       };
-      console.log('Mapped round data:', mapped);
-      console.log('GIR by distance in mapped data:', mapped.girByDistance);
       return mapped;
     }) || [];
 
@@ -148,15 +126,9 @@ export const statsService = {
       return { data: null, error };
     }
 
-    console.log('Calculating averages for rounds:', data.length);
-    console.log('Rounds data:', data.map(r => ({ holes: r.totalHoles, score: r.totalScore, putts: r.totalPutts })));
-
     // Separar rondas por número de hoyos
     const rounds9Holes = data.filter(round => round.totalHoles === 9);
     const rounds18Holes = data.filter(round => round.totalHoles === 18);
-
-    console.log('9-hole rounds:', rounds9Holes.length);
-    console.log('18-hole rounds:', rounds18Holes.length);
 
     const averages = {
       // Estadísticas generales (todas las rondas)
@@ -242,17 +214,6 @@ export const statsService = {
         };
       })()
     };
-
-    console.log('Calculated averages:', {
-      averageScore9Holes: averages.averageScore9Holes,
-      averageScore18Holes: averages.averageScore18Holes,
-      averageFir9Holes: averages.averageFir9Holes,
-      averageFir18Holes: averages.averageFir18Holes,
-      averageGir9Holes: averages.averageGir9Holes,
-      averageGir18Holes: averages.averageGir18Holes,
-      averagePutts9Holes: averages.averagePutts9Holes,
-      averagePutts18Holes: averages.averagePutts18Holes
-    });
 
     return { data: averages, error: null };
   }

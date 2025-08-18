@@ -19,19 +19,15 @@ export function NewRound() {
   const [showSuccess, setShowSuccess] = useState(false);
 
   const handleHoleComplete = (stats: HoleStats) => {
-    console.log('Hole complete:', stats);
     const updatedStats = [...holeStats];
     const existingIndex = updatedStats.findIndex(s => s.holeNumber === stats.holeNumber);
     
     if (existingIndex >= 0) {
       updatedStats[existingIndex] = stats;
-      console.log('Updated existing hole stats');
     } else {
       updatedStats.push(stats);
-      console.log('Added new hole stats');
     }
     
-    console.log('All hole stats:', updatedStats);
     setHoleStats(updatedStats);
     
     if (currentHole < totalHoles) {
@@ -54,15 +50,10 @@ export function NewRound() {
       return;
     }
 
-    console.log('Current user (complete):', user);
-    console.log('User ID (complete):', user.id);
-    console.log('User ID type (complete):', typeof user.id);
-
     setIsSaving(true);
     
     try {
       const roundStats = calculateRoundStats(stats, courseName);
-      console.log('Round stats to save (complete):', roundStats);
       
       const { error } = await statsService.saveRoundStats({
         ...roundStats,
@@ -70,7 +61,6 @@ export function NewRound() {
       });
       
       if (error) {
-        console.error('Error saving round:', error);
         alert(`Error al guardar la ronda: ${error.message || 'Error desconocido'}`);
       } else {
         setShowSuccess(true);
@@ -85,7 +75,6 @@ export function NewRound() {
         }, 3000);
       }
     } catch (error) {
-      console.error('Error:', error);
       alert('Error al guardar la ronda. Inténtalo de nuevo.');
     } finally {
       setIsSaving(false);
@@ -98,10 +87,6 @@ export function NewRound() {
       return;
     }
 
-    console.log('Current user:', user);
-    console.log('User ID:', user.id);
-    console.log('User ID type:', typeof user.id);
-
     if (holeStats.length === 0) {
       alert('No hay estadísticas para guardar. Completa al menos un hoyo.');
       return;
@@ -111,7 +96,6 @@ export function NewRound() {
     
     try {
       const roundStats = calculateRoundStats(holeStats, courseName);
-      console.log('Round stats to save:', roundStats);
       
       const { error } = await statsService.saveRoundStats({
         ...roundStats,
@@ -119,7 +103,6 @@ export function NewRound() {
       });
       
       if (error) {
-        console.error('Error saving round:', error);
         alert(`Error al guardar la ronda: ${error.message || 'Error desconocido'}`);
       } else {
         setShowSuccess(true);
@@ -134,7 +117,6 @@ export function NewRound() {
         }, 3000);
       }
     } catch (error) {
-      console.error('Error:', error);
       alert('Error al guardar la ronda. Inténtalo de nuevo.');
     } finally {
       setIsSaving(false);
