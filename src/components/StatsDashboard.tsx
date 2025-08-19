@@ -36,11 +36,13 @@ interface AverageStats {
 
   // Data for charts
   girByDistance?: {
-    total: number;
-    gir: number;
-    percentage: number;
-    averageFirstPuttDistance: number;
-  }[];
+    [key: string]: {
+      total: number;
+      gir: number;
+      percentage: number;
+      averageFirstPuttDistance: number;
+    };
+  };
 
   makeRatePutts?: {
     [key: string]: number;
@@ -110,24 +112,43 @@ export function StatsDashboard({ userId }: StatsDashboardProps) {
   const girByDistanceData = useMemo(() => {
     if (!averageStats?.girByDistance) return [];
     
-    return Object.entries(averageStats.girByDistance).map(([range, data]) => ({
-      range,
-      total: data.total,
-      gir: data.gir,
-      percentage: data.percentage,
-      averageFirstPuttDistance: data.averageFirstPuttDistance
-    }));
+    // Función para extraer el valor mínimo de un rango (ej: "50-60m" -> 50)
+    const getMinDistance = (range: string) => {
+      const match = range.match(/(\d+)/);
+      return match ? parseInt(match[1]) : 0;
+    };
+    
+    const data = Object.entries(averageStats.girByDistance)
+      .map(([range, data]) => ({
+        range,
+        total: data.total,
+        gir: data.gir,
+        percentage: data.percentage,
+        averageFirstPuttDistance: data.averageFirstPuttDistance
+      }))
+      .sort((a, b) => getMinDistance(a.range) - getMinDistance(b.range)); // Ordenar por distancia mínima
+    
+    return data;
   }, [averageStats?.girByDistance]);
 
   const averageFirstPuttDistanceData = useMemo(() => {
     if (!averageStats?.girByDistance) return [];
     
-    return Object.entries(averageStats.girByDistance)
+    // Función para extraer el valor mínimo de un rango (ej: "50-60m" -> 50)
+    const getMinDistance = (range: string) => {
+      const match = range.match(/(\d+)/);
+      return match ? parseInt(match[1]) : 0;
+    };
+    
+    const data = Object.entries(averageStats.girByDistance)
       .filter(([_, data]) => data.averageFirstPuttDistance > 0)
       .map(([range, data]) => ({
         range,
         averageDistance: data.averageFirstPuttDistance
-      }));
+      }))
+      .sort((a, b) => getMinDistance(a.range) - getMinDistance(b.range)); // Ordenar por distancia mínima
+    
+    return data;
   }, [averageStats?.girByDistance]);
 
   const makeRatePuttsData = useMemo(() => {
@@ -341,9 +362,10 @@ export function StatsDashboard({ userId }: StatsDashboardProps) {
       )}
 
       {/* GIR by Distance Chart */}
-      {girByDistanceData.length > 0 && (
-        <div className="card">
-          <h3 className="text-lg font-semibold text-masters-dark-green mb-4">GIR por Distancia</h3>
+      <div className="card">
+        <h3 className="text-lg font-semibold text-masters-dark-green mb-4">GIR por Distancia</h3>
+
+        {girByDistanceData.length > 0 ? (
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={girByDistanceData}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -356,13 +378,19 @@ export function StatsDashboard({ userId }: StatsDashboardProps) {
               <Bar dataKey="percentage" fill="#0F5132" />
             </BarChart>
           </ResponsiveContainer>
-        </div>
-      )}
+        ) : (
+          <div className="text-center py-8 text-masters-dark-green">
+            <p>No hay datos de GIR por distancia disponibles.</p>
+            <p className="text-sm mt-2">Los datos se mostrarán cuando registres rondas con información de distancia.</p>
+          </div>
+        )}
+      </div>
 
       {/* Average First Putt Distance by GIR Distance Range Chart */}
-      {averageFirstPuttDistanceData.length > 0 && (
-        <div className="card">
-          <h3 className="text-lg font-semibold text-masters-dark-green mb-4">Distancia Promedio al Hoyo por Rango de GIR</h3>
+      <div className="card">
+        <h3 className="text-lg font-semibold text-masters-dark-green mb-4">Distancia Promedio al Hoyo por Rango de GIR</h3>
+
+        {averageFirstPuttDistanceData.length > 0 ? (
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={averageFirstPuttDistanceData}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -375,8 +403,13 @@ export function StatsDashboard({ userId }: StatsDashboardProps) {
               <Bar dataKey="averageDistance" fill="#D4AF37" />
             </BarChart>
           </ResponsiveContainer>
-        </div>
-      )}
+        ) : (
+          <div className="text-center py-8 text-masters-dark-green">
+            <p>No hay datos de distancia promedio al hoyo disponibles.</p>
+            <p className="text-sm mt-2">Los datos se mostrarán cuando registres rondas con información de distancia del primer putt.</p>
+          </div>
+        )}
+      </div>
 
       {/* Make Rate Putts Chart */}
       {makeRatePuttsData.length > 0 && (

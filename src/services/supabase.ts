@@ -212,6 +212,88 @@ export const statsService = {
           par4: allPar4Scores.length > 0 ? allPar4Scores.reduce((sum, score) => sum + score, 0) / allPar4Scores.length : 0,
           par5: allPar5Scores.length > 0 ? allPar5Scores.reduce((sum, score) => sum + score, 0) / allPar5Scores.length : 0,
         };
+      })(),
+
+      // GIR por distancia y distancia promedio del primer putt
+      girByDistance: (() => {
+        const distanceRanges = new Set<string>();
+        const girByRange: { [key: string]: { total: number; gir: number; firstPuttDistances: number[] } } = {};
+
+        // Recopilar todos los rangos de distancia y datos
+        data.forEach(round => {
+          if (round.girByDistance) {
+            Object.entries(round.girByDistance).forEach(([range, stats]: [string, any]) => {
+              distanceRanges.add(range);
+              if (!girByRange[range]) {
+                girByRange[range] = { total: 0, gir: 0, firstPuttDistances: [] };
+              }
+              girByRange[range].total += stats.total || 0;
+              girByRange[range].gir += stats.gir || 0;
+              
+              // Agregar distancias del primer putt si están disponibles
+              if (stats.averageFirstPuttDistance && stats.averageFirstPuttDistance > 0) {
+                girByRange[range].firstPuttDistances.push(stats.averageFirstPuttDistance);
+              }
+            });
+          }
+        });
+
+        // Calcular promedios por rango
+        const result: { [key: string]: { total: number; gir: number; percentage: number; averageFirstPuttDistance: number } } = {};
+        
+        // Función para extraer el valor mínimo de un rango (ej: "50-60m" -> 50)
+        const getMinDistance = (range: string) => {
+          const match = range.match(/(\d+)/);
+          return match ? parseInt(match[1]) : 0;
+        };
+        
+        // Ordenar los rangos por distancia mínima antes de procesarlos
+        const sortedRanges = Array.from(distanceRanges).sort((a, b) => getMinDistance(a) - getMinDistance(b));
+        
+        sortedRanges.forEach(range => {
+          const data = girByRange[range];
+          const percentage = data.total > 0 ? (data.gir / data.total) * 100 : 0;
+          const averageFirstPuttDistance = data.firstPuttDistances.length > 0 
+            ? data.firstPuttDistances.reduce((sum, dist) => sum + dist, 0) / data.firstPuttDistances.length 
+            : 0;
+          
+          result[range] = {
+            total: data.total,
+            gir: data.gir,
+            percentage: percentage,
+            averageFirstPuttDistance: averageFirstPuttDistance
+          };
+        });
+
+        return result;
+      })(),
+
+      // Porcentaje de acierto de putts por distancia
+      makeRatePutts: (() => {
+        const puttRanges: { [key: string]: { total: number; made: number } } = {};
+
+        // Recopilar datos de putts por distancia
+        data.forEach(round => {
+          if (round.makeRatePutts) {
+            Object.entries(round.makeRatePutts).forEach(([range, stats]: [string, any]) => {
+              if (!puttRanges[range]) {
+                puttRanges[range] = { total: 0, made: 0 };
+              }
+              puttRanges[range].total += stats.total || 0;
+              puttRanges[range].made += stats.made || 0;
+            });
+          }
+        });
+
+        // Calcular porcentajes
+        const result: { [key: string]: number } = {};
+        Object.entries(puttRanges).forEach(([range, data]) => {
+          if (data.total > 0) {
+            result[range] = (data.made / data.total) * 100;
+          }
+        });
+
+        return result;
       })()
     };
 
