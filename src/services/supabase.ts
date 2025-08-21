@@ -74,7 +74,9 @@ export const statsService = {
       .eq('user_id', userId)
       .order('timestamp', { ascending: false });
 
-    if (filter === 'Últimas 5 rondas') {
+    if (filter === 'Última Ronda') {
+      query = query.limit(1);
+    } else if (filter === 'Últimas 5 rondas') {
       query = query.limit(5);
     } else if (filter === 'Últimas 20 rondas') {
       query = query.limit(20);

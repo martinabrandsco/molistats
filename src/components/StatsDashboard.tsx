@@ -193,7 +193,7 @@ export function StatsDashboard({ userId }: StatsDashboardProps) {
       <div className="card">
         <h3 className="text-lg font-semibold text-masters-dark-green mb-4">Filtro de Estadísticas</h3>
         <div className="flex gap-2 flex-wrap">
-          {(['Todas', 'Últimas 5 rondas', 'Últimas 20 rondas'] as FilterOption[]).map((option) => (
+          {(['Todas', 'Última Ronda', 'Últimas 5 rondas', 'Últimas 20 rondas'] as FilterOption[]).map((option) => (
             <button
               key={option}
               onClick={() => setFilter(option)}
