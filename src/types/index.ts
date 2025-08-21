@@ -61,4 +61,4 @@ export interface DistanceInterval {
   max: number;
 }
 
-export type FilterOption = 'Todas' | 'Últimas 5 rondas' | 'Últimas 20 rondas'; 
+export type FilterOption = 'Todas' | 'Última Ronda' | 'Últimas 5 rondas' | 'Últimas 20 rondas'; 
