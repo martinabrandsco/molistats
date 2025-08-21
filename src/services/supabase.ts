@@ -270,26 +270,41 @@ export const statsService = {
 
       // Porcentaje de acierto de putts por distancia
       makeRatePutts: (() => {
-        const puttRanges: { [key: string]: { total: number; made: number } } = {};
+        // Compatibilidad con dos formatos posibles en las rondas almacenadas:
+        // 1) { range: number } -> porcentaje por rango (formato actual)
+        // 2) { range: { total: number, made: number } } -> datos brutos (formato anterior)
+        const puttRanges: { [key: string]: { total: number; made: number; sumPercentage: number; count: number } } = {};
 
         // Recopilar datos de putts por distancia
         data.forEach(round => {
           if (round.makeRatePutts) {
-            Object.entries(round.makeRatePutts).forEach(([range, stats]: [string, any]) => {
+            Object.entries(round.makeRatePutts).forEach(([range, value]: [string, any]) => {
               if (!puttRanges[range]) {
-                puttRanges[range] = { total: 0, made: 0 };
+                puttRanges[range] = { total: 0, made: 0, sumPercentage: 0, count: 0 };
               }
-              puttRanges[range].total += stats.total || 0;
-              puttRanges[range].made += stats.made || 0;
+
+              if (typeof value === 'number') {
+                // Formato actual: porcentaje ya calculado
+                puttRanges[range].sumPercentage += value;
+                puttRanges[range].count += 1;
+              } else if (value && typeof value === 'object') {
+                // Formato anterior: acumular totales para calcular el porcentaje global
+                puttRanges[range].total += value.total || 0;
+                puttRanges[range].made += value.made || 0;
+              }
             });
           }
         });
 
-        // Calcular porcentajes
+        // Calcular porcentajes por rango
         const result: { [key: string]: number } = {};
-        Object.entries(puttRanges).forEach(([range, data]) => {
-          if (data.total > 0) {
-            result[range] = (data.made / data.total) * 100;
+        Object.entries(puttRanges).forEach(([range, agg]) => {
+          if (agg.total > 0) {
+            // Si hay datos brutos, usar porcentaje global
+            result[range] = (agg.made / agg.total) * 100;
+          } else if (agg.count > 0) {
+            // Si solo hay porcentajes, promediar entre rondas
+            result[range] = agg.sumPercentage / agg.count;
           }
         });
 
